@@ -1,0 +1,6 @@
+import { pool } from '@/lib/db';
+import { bad, denied, isAdmin, sameOrigin } from '@/lib/security';
+import { z } from 'zod';
+const schema=z.object({title:z.string().trim().min(1).max(160),description:z.string().max(3000).default(''),starts_at:z.iso.datetime({offset:true}).nullable().optional(),ends_at:z.iso.datetime({offset:true}).nullable().optional(),reveal_at:z.iso.datetime({offset:true}).nullable().optional()});
+export async function GET(){if(!await isAdmin())return denied();const r=await pool.query(`SELECT p.*, count(t.id)::int AS token_count,count(t.id) FILTER (WHERE t.used)::int AS used_count FROM polls p LEFT JOIN access_tokens t ON t.poll_id=p.id GROUP BY p.id ORDER BY p.created_at DESC`);return Response.json(r.rows)}
+export async function POST(req:Request){if(!await isAdmin())return denied();if(!await sameOrigin(req))return bad('Origem inválida.',403);const v=schema.safeParse(await req.json().catch(()=>null));if(!v.success)return bad('Dados da votação inválidos.');const x=v.data;if(x.starts_at&&x.ends_at&&x.ends_at<=x.starts_at)return bad('O encerramento deve ser posterior à abertura.');const r=await pool.query('INSERT INTO polls(title,description,starts_at,ends_at,reveal_at) VALUES ($1,$2,$3,$4,$5) RETURNING id',[x.title,x.description,x.starts_at||null,x.ends_at||null,x.reveal_at||null]);return Response.json(r.rows[0],{status:201})}
