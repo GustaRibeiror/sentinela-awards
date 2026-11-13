@@ -1,0 +1,2 @@
+import { readFile } from 'node:fs/promises';import path from 'node:path';
+export async function GET(_:Request,{params}:{params:Promise<{name:string}>}){const {name}=await params;if(!/^[a-f0-9-]+\.(jpg|png|webp)$/.test(name))return new Response(null,{status:404});try{const body=await readFile(path.join(process.cwd(),'data','images',name));return new Response(body,{headers:{'Content-Type':name.endsWith('png')?'image/png':name.endsWith('webp')?'image/webp':'image/jpeg','Cache-Control':'public, max-age=86400'}});}catch{return new Response(null,{status:404});}}
