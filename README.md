@@ -10,6 +10,8 @@ Premiação ao vivo com host, QR Code e voto por categoria. Usa SQLite local, se
 4. Acesse `/admin`, crie a premiação e envie imagens opcionais. Cada convidado entra pelo QR Code e digita nome e sobrenome.
 5. Abra a TV pelo painel. O QR tenta usar automaticamente o IP do notebook na rede local, mesmo que o painel esteja em `localhost`. Confira o link exibido sob o QR e ajuste-o ali se necessário. Todos precisam estar no mesmo Wi-Fi.
 
+Para cadastrar as 13 categorias de exemplo do Sentinela Awards 2026 em um banco novo, execute `node scripts/seed-awards.mjs` uma vez. Cada categoria terá Opção A, B, C e D.
+
 O banco surge automaticamente em `data/sentinela.sqlite`; as imagens ficam em `data/images/`. Faça backup da pasta `data/` e do `.env.local` após o evento.
 
 ## Ao vivo
